@@ -41,8 +41,9 @@ $strInputFiles = [
 foreach ($strInputFiles as $strInputFile) {
     $arrayQueryLines = $app->getQueryForAssessmentToArray($strInputFile);
     if ($arrayQueryLines != []) {
-        $app->displaySqlQueryType(implode(' ', $arrayQueryLines));
-        $app->evaluateSqlQuery('MySQL', $arrayQueryLines);
+        $arrayDetected = $app->getSqlQueryType(implode(' ', $arrayQueryLines));
+        $app->displaySqlQueryType($arrayDetected);
+        $app->evaluateSqlQuery('MySQL', $arrayDetected['Type'], $arrayQueryLines);
     }
     echo '<hr/>';
 }

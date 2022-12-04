@@ -29,26 +29,21 @@ namespace danielgp\sql_query_assessment;
 class ClassSqlQueryAssessment
 {
 
-    use \danielgp\io_operations\InputOutputFiles,
-        \danielgp\io_operations\InputOutputQueries;
+    use \danielgp\io_operations\InputOutputQueries,
+        \danielgp\sql_query_assessment\TraitConfiguration,
+        \danielgp\sql_query_assessment\TraitUserInterface;
 
-    private $arrayConfiguration;
     private $arraySqlFlavours;
-    private $classTimer;
     private $arrayNonVisibleCharactersMapping;
-    public $strMainFolder;
 
     public function __construct()
     {
-        $this->classTimer                       = new \SebastianBergmann\Timer\Timer;
-        $this->classTimer->start();
-        $this->strMainFolder                    = str_replace('source', '', __DIR__);
+        $this->initiateUserInterface();
         $this->arrayNonVisibleCharactersMapping = [
             \IntlChar::chr(\IntlChar::charFromName("SPACE")) => \IntlChar::chr(\IntlChar::charFromName("FULL STOP")),
             \IntlChar::chr(9)                                => \IntlChar::chr(\IntlChar::charFromName("COMBINING DOUBLE RIGHTWARDS ARROW BELOW")),
         ];
-        $this->arrayConfiguration               = $this->getArrayFromJsonFile($this->strMainFolder, 'composer.json');
-        $this->arraySqlFlavours                 = $this->getArrayFromJsonFile($this->strMainFolder, 'config.json');
+        $this->arraySqlFlavours                 = $this->configurationStructure();
     }
 
     private function displayTabsAndSpacesInconsistency($arrayNumbers)
@@ -97,9 +92,13 @@ class ClassSqlQueryAssessment
         }
     }
 
-    public function displaySqlQueryType($strQueryContent)
+    public function getSqlQueryType($strQueryContent)
     {
-        $arrayDetected = $this->getMySQLqueryType($strQueryContent);
+        return $this->getMySQLqueryType($strQueryContent);
+    }
+
+    public function displaySqlQueryType($arrayDetected)
+    {
         echo vsprintf('<p style="color:green;">Given query has been detected to be %s which stands for %s.'
                 . '<span style="font-size:0.6em;">This determination was done by 1st keyword begin %s which %s.</span></p>', [
             $arrayDetected['Type'],
@@ -109,7 +108,7 @@ class ClassSqlQueryAssessment
         ]);
     }
 
-    public function evaluateSqlQuery($strSqlFlavour, $arrayQueryLines)
+    public function evaluateSqlQuery($strSqlFlavour, $strQueryType, $arrayQueryLines)
     {
         $arrayQueryLinesEnhanced = $this->packArrayWithQueryLines($arrayQueryLines);
         $arrayNumbers            = [];
@@ -122,7 +121,8 @@ class ClassSqlQueryAssessment
             $longTotalLength += $arrayLineAttributes['length'];
             echo '<span style="color:#888;font-style:italic;font-size:0.5em;">'
             . '=> length=' . $arrayLineAttributes['length']
-            . ', TOTAL length=' . $longTotalLength;
+            . ', EOL length=' . $longTotalLength
+            . ', Indentation=' . $arrayLineAttributes['indentation'];
             if ($arrayLineAttributes['lengthTrimmed'] == 0) {
                 echo ', Empty line';
             } else {
@@ -131,16 +131,82 @@ class ClassSqlQueryAssessment
                         . implode('|', $this->arraySqlFlavours[$strSqlFlavour]['Statement Keywords']) . ')/i';
                 $flagMatch    = PREG_OFFSET_CAPTURE | PREG_UNMATCHED_AS_NULL;
                 preg_match_all($strReg, $arrayLineAttributes['content'], $arrayMatches, $flagMatch);
+                unset($strReg);
                 if ($arrayMatches[0] == []) {
                     echo ', No statement keywords match found';
                 } else {
                     foreach ($arrayMatches[0] as $intMatchNo => $arrayMatchDetails) {
-                        echo vsprintf(', Match %d of <b>%s</b> statement keyword found at %d character position', [
+                        echo vsprintf(', Match %d of &quot;%s&quot; statement keyword found at %d character position', [
                             ($intMatchNo + 1),
                             $arrayMatchDetails[0],
                             $arrayMatchDetails[1],
                         ]);
+                        if ((in_array(strtoupper($arrayMatchDetails[0]), $this->arraySqlFlavours[$strSqlFlavour]['Single Line Statement Keywords'])) && ($arrayLineAttributes['contentTrimmed'] !== $arrayMatchDetails[0])) {
+                            $arrayPenalties['SINGLE_LINE_STATEMENT_KEYWORD'][strtoupper($arrayMatchDetails[0])][] = [
+                                'whichLine'     => ($intLineNo + 1),
+                                'whichPosition' => $arrayMatchDetails[1],
+                            ];
+                        }
                     }
+                }
+                $strRegCoOp = '/('
+                        . implode('|', $this->arraySqlFlavours[$strSqlFlavour]['Operators']['Composite']) . ')/i';
+                preg_match_all($strRegCoOp, $arrayLineAttributes['content'], $arrayMatchesCoOp, $flagMatch);
+                unset($strRegCoOp);
+                if ($arrayMatchesCoOp[0] == []) {
+                    $strRegSiOp = '/('
+                            . implode('|', $this->arraySqlFlavours[$strSqlFlavour]['Operators']['Single']) . ')/i';
+                    preg_match_all($strRegSiOp, $arrayLineAttributes['content'], $arrayMatchesSiOp, $flagMatch);
+                    unset($strRegSiOp);
+                    if ($arrayMatchesSiOp[0] != []) {
+                        foreach ($arrayMatchesSiOp[0] as $intMatchNo => $arrayMatchDetails) {
+                            if ((substr($arrayLineAttributes['content'], $arrayMatchDetails[1] - 1, 1) != ' ') && (substr($arrayLineAttributes['content'], $arrayMatchDetails[1] + strlen($arrayMatchDetails[0]), 1) != ' ')) {
+                                $arrayPenalties['OPERATOR'][$arrayMatchDetails[0]][] = [
+                                    'fault'         => 'MISSING BOTH SPACES',
+                                    'whichLine'     => ($intLineNo + 1),
+                                    'whichPosition' => $arrayMatchDetails[1],
+                                ];
+                            } elseif (substr($arrayLineAttributes['content'], $arrayMatchDetails[1] - 1, 1) != ' ') {
+                                $arrayPenalties['OPERATOR'][$arrayMatchDetails[0]][] = [
+                                    'fault'         => 'MISSING SPACE BEFORE',
+                                    'whichLine'     => ($intLineNo + 1),
+                                    'whichPosition' => $arrayMatchDetails[1],
+                                ];
+                            } elseif (substr($arrayLineAttributes['content'], $arrayMatchDetails[1] + strlen($arrayMatchDetails[0]), 1) != ' ') {
+                                $arrayPenalties['OPERATOR'][$arrayMatchDetails[0]][] = [
+                                    'fault'         => 'MISSING SPACE AFTER',
+                                    'whichLine'     => ($intLineNo + 1),
+                                    'whichPosition' => $arrayMatchDetails[1],
+                                ];
+                            }
+                        }
+                        /* echo '<br/>Single Operator';
+                          var_dump($arrayMatchesSiOp[0]); */
+                    }
+                } else {
+                    foreach ($arrayMatchesCoOp[0] as $intMatchNo => $arrayMatchDetails) {
+                        if ((substr($arrayLineAttributes['content'], $arrayMatchDetails[1] - 1, 1) != ' ') && (substr($arrayLineAttributes['content'], $arrayMatchDetails[1] + strlen($arrayMatchDetails[0]), 1) != ' ')) {
+                            $arrayPenalties['OPERATOR'][$arrayMatchDetails[0]][] = [
+                                'fault'         => 'MISSING BOTH SPACES',
+                                'whichLine'     => ($intLineNo + 1),
+                                'whichPosition' => $arrayMatchDetails[1],
+                            ];
+                        } elseif (substr($arrayLineAttributes['content'], $arrayMatchDetails[1] - 1, 1) != ' ') {
+                            $arrayPenalties['OPERATOR'][$arrayMatchDetails[0]][] = [
+                                'fault'         => 'MISSING SPACE BEFORE',
+                                'whichLine'     => ($intLineNo + 1),
+                                'whichPosition' => $arrayMatchDetails[1],
+                            ];
+                        } elseif (substr($arrayLineAttributes['content'], $arrayMatchDetails[1] + strlen($arrayMatchDetails[0]), 1) != ' ') {
+                            $arrayPenalties['OPERATOR'][$arrayMatchDetails[0]][] = [
+                                'fault'         => 'MISSING SPACE AFTER',
+                                'whichLine'     => ($intLineNo + 1),
+                                'whichPosition' => $arrayMatchDetails[1],
+                            ];
+                        }
+                    }
+                    /* echo '<br/>Composite Operator';
+                      var_dump($arrayMatchesCoOp[0]); */
                 }
             }
             if ($arrayLineAttributes['length'] != $arrayLineAttributes['lengthWithoutSpaces']) {
@@ -162,14 +228,13 @@ class ClassSqlQueryAssessment
                     'whichLine' => ($intLineNo + 1),
                 ];
             }
-            echo '</span>';
-            echo '</code>';
-            echo '<br/>';
+            echo '</span>' . '</code>' . '<br/>';
         }
         echo '</pre>';
         $this->displayTrailingSpaces($arrayPenalties);
+        $this->displaySingleLineStatementKeyword($strSqlFlavour, $arrayPenalties);
         $this->displayTabsAndSpacesInconsistency($arrayNumbers);
-        //var_dump($arrayNumbers);
+        $this->displayOperatorsImproper($arrayPenalties);
     }
 
     public function getQueryForAssessmentToArray($strInputFile): array
@@ -188,11 +253,13 @@ class ClassSqlQueryAssessment
             $arrayQueryLinesEnhanced[$intLineNo] = [
                 'content'             => $strLineContent,
                 'contentRightTrimmed' => rtrim($strLineContent),
+                'contentTrimmed'      => trim($strLineContent),
                 'length'              => strlen($strLineContent),
                 'lengthRightTrimmed'  => strlen(rtrim($strLineContent)),
                 'lengthTrimmed'       => strlen(trim($strLineContent)),
                 'lengthWithoutSpaces' => strlen(str_replace(' ', '', $strLineContent)),
                 'lengthWithoutTabs'   => strlen(str_replace(chr(9), '', $strLineContent)),
+                'indentation'         => (strlen($strLineContent) - strlen(ltrim($strLineContent))),
             ];
         }
         unset($arrayQueryLines); // garbage collection
@@ -206,46 +273,6 @@ class ClassSqlQueryAssessment
             $this->setVisualStyleForNonVisibleCharacters(array_values($this->arrayNonVisibleCharactersMapping)),
         ];
         return str_replace($arrayReplace[0], $arrayReplace[1], $strContent);
-    }
-
-    public function setHtmlFooter(): void
-    {
-        $strHtmlContent = <<<HTML_CONTENT
-<footer>
-%s - &copy; %s by %s
-</footer>
-</body>
-</html>
-HTML_CONTENT;
-        echo vsprintf($strHtmlContent, [
-            (new \SebastianBergmann\Timer\ResourceUsageFormatter)->resourceUsage($this->classTimer->stop()),
-            date('Y'),
-            $this->arrayConfiguration['authors'][0]['name'],
-        ]);
-    }
-
-    public function setHtmlHeader(): void
-    {
-        $strHtmlContent = <<<HTML_CONTENT
-<!doctype html>
-<html lang="en">
-<head>
-    <title>%s</title>
-    <meta name="Author" content="%s">
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-Zenh87qX5JnK2Jl0vWa8Ck2rdkQ2Bzep5IDxbcnCeuOxjzrPF/et3URy9Bv1WTRi" crossorigin="anonymous">
-    <link rel="stylesheet" href="../styles/sqa_main_style.css">
-</head>
-<body>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-OERcA2EqjJCMA+/3y+gxIOqMEjwtxJY7qPCqsdltbNJuaOe923+mo//f6V8Qbsw3" crossorigin="anonymous" defer></script>
-    <h1>%s</h1>
-HTML_CONTENT;
-        echo vsprintf($strHtmlContent, [
-            $this->arrayConfiguration['name'],
-            $this->arrayConfiguration['authors'][0]['name'],
-            $this->arrayConfiguration['name'],
-        ]);
     }
 
     private function setVisualStyleForNonVisibleCharacters($arrayInputStrings): array
