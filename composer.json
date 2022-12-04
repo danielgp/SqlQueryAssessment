@@ -1,0 +1,35 @@
+{
+    "name": "danielgp/sql_query_assessment",
+    "description": "Assesses SQL Query statements against customizable best practices formatting",
+    "type": "application",
+    "license": "MIT",
+    "authors": [
+        {
+            "name":  "Daniel Popiniuc",
+            "email": "danielpopiniuc@gmail.com",
+            "role":  "Developer"
+        }
+    ],
+    "require": {
+        "php":                          ">=8.1",
+        "danielgp/io-operations":       "~1.1.4",
+        "fortawesome/font-awesome":     "~6.2",
+        "phpunit/php-timer":            "~5.0",
+        "twbs/bootstrap":               "~5.2"
+    },
+    "autoload": {
+        "psr-4": {
+            "danielgp\\sql_query_assessment\\":  "source/"
+        }
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true,
+    "archive": {
+        "exclude": [
+            "/nbproject", 
+            "/vendor", 
+            "/tests"
+        ],
+        "name": "archive__SqlQueryAssessment"
+    }
+}
