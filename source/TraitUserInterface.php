@@ -83,13 +83,7 @@ trait TraitUserInterface
 
     public function setHtmlFooter(): void
     {
-        $strHtmlContent = <<<HTML_CONTENT
-<footer>
-%s - &copy; %s by %s
-</footer>
-</body>
-</html>
-HTML_CONTENT;
+        $strHtmlContent = implode('', file(__DIR__ . '/footer.inc.html', FILE_IGNORE_NEW_LINES));
         echo vsprintf($strHtmlContent, [
             (new \SebastianBergmann\Timer\ResourceUsageFormatter)->resourceUsage($this->classTimer->stop()),
             date('Y'),
@@ -99,21 +93,7 @@ HTML_CONTENT;
 
     public function setHtmlHeader(): void
     {
-        $strHtmlContent = <<<HTML_CONTENT
-<!doctype html>
-<html lang="en">
-<head>
-    <title>%s</title>
-    <meta name="Author" content="%s">
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-Zenh87qX5JnK2Jl0vWa8Ck2rdkQ2Bzep5IDxbcnCeuOxjzrPF/et3URy9Bv1WTRi" crossorigin="anonymous">
-    <link rel="stylesheet" href="../styles/sqa_main_style.css">
-</head>
-<body>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-OERcA2EqjJCMA+/3y+gxIOqMEjwtxJY7qPCqsdltbNJuaOe923+mo//f6V8Qbsw3" crossorigin="anonymous" defer></script>
-    <h1>%s</h1>
-HTML_CONTENT;
+        $strHtmlContent = implode('', file(__DIR__ . '/header.inc.html', FILE_IGNORE_NEW_LINES));
         echo vsprintf($strHtmlContent, [
             $this->arrayConfiguration['name'],
             $this->arrayConfiguration['authors'][0]['name'],
