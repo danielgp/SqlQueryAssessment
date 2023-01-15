@@ -195,6 +195,9 @@ class ClassSqlQueryAssessment
             . ', Indentation=' . $arrayLineAttributes['indentation'];
             if ($arrayLineAttributes['lengthTrimmed'] == 0) {
                 echo ', Empty line';
+                $this->arrayPenalties[$intFileNo]['EMPTY_LINE'][] = [
+                    'whichLine' => ($intLineNo + 1),
+                ];
             } else {
                 $this->detectStatements($strSqlFlavour, $intFileNo, $intLineNo, $arrayLineAttributes);
                 $this->detectOperators($strSqlFlavour, $intFileNo, $intLineNo, $arrayLineAttributes);
@@ -224,6 +227,7 @@ class ClassSqlQueryAssessment
         $this->displayTrailingSpaces($this->arrayPenalties[$intFileNo]);
         $this->displaySingleLineStatementKeyword($strSqlFlavour, $this->arrayPenalties[$intFileNo]);
         $this->displayTabsAndSpacesInconsistency($arrayNumbers);
+        $this->displayEmptyLines($this->arrayPenalties[$intFileNo]);
         $this->displayOperatorsImproper($this->arrayPenalties[$intFileNo]);
     }
 

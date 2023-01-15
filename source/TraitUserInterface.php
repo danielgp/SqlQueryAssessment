@@ -34,6 +34,20 @@ trait TraitUserInterface
     private $arrayConfiguration;
     public $strMainFolder;
 
+    private function displayEmptyLines($arrayPenalties)
+    {
+        if (!is_null($arrayPenalties) && array_key_exists('EMPTY_LINE', $arrayPenalties)) {
+            $arrayWhichLines = array_column($arrayPenalties['EMPTY_LINE'], 'whichLine');
+            if ($arrayWhichLines != []) {
+                echo vsprintf('<p style="color:red;">'
+                        . 'EMPTY lines were found on line(s) %s'
+                        . '</p>', [
+                    implode(', ', $arrayWhichLines),
+                ]);
+            }
+        }
+    }
+
     private function displayOperatorsImproper($arrayPenalties)
     {
         if (!is_null($arrayPenalties) && array_key_exists('OPERATOR', $arrayPenalties)) {
