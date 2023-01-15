@@ -36,11 +36,15 @@ trait TraitUserInterface
 
     private function displayOperatorsImproper($arrayPenalties)
     {
-        if (array_key_exists('OPERATOR', $arrayPenalties)) {
+        if (!is_null($arrayPenalties) && array_key_exists('OPERATOR', $arrayPenalties)) {
             foreach ($arrayPenalties['OPERATOR'] as $strOperator => $arrayMatchingDetails) {
                 foreach ($arrayMatchingDetails as $arrayMatchingDetails2) {
-                    echo vsprintf('<p style="color:red;">Operator %s seen but has an issue of type %s'
-                            . ' and this happened on line %d position %d</p>', [
+                    if ((substr($strOperator, -1) == '=') && !in_array(substr($strOperator, 0, 1), ['!', '<', '>'])) {
+                        $strOperator = '=';
+                    }
+                    echo vsprintf('<p style="color:red;">'
+                            . 'Operator %s seen but has an issue of type %s and this happened on line %d position %d'
+                            . '</p>', [
                         $strOperator,
                         $arrayMatchingDetails2['fault'],
                         $arrayMatchingDetails2['whichLine'],
@@ -53,19 +57,20 @@ trait TraitUserInterface
 
     private function displaySingleLineStatementKeyword($strSqlFlavour, $arrayPenalties)
     {
-        if (array_key_exists('SINGLE_LINE_STATEMENT_KEYWORD', $arrayPenalties)) {
-            foreach ($this->arraySqlFlavours[$strSqlFlavour]['Single Line Statement Keywords'] as $strStatementKeyword) {
-                if (array_key_exists($strStatementKeyword, $arrayPenalties['SINGLE_LINE_STATEMENT_KEYWORD'])) {
+        if (!is_null($arrayPenalties) && array_key_exists('SINGLE_LINE_STATEMENT_KEYWORD', $arrayPenalties)) {
+            foreach ($this->arraySqlFlavours[$strSqlFlavour]['Single Line Statement Keywords'] as $strStmntKeyword) {
+                if (array_key_exists($strStmntKeyword, $arrayPenalties['SINGLE_LINE_STATEMENT_KEYWORD'])) {
                     $arrayOccurence = [];
-                    foreach ($arrayPenalties['SINGLE_LINE_STATEMENT_KEYWORD'][$strStatementKeyword] as $arrayMatchingDetails) {
+                    foreach ($arrayPenalties['SINGLE_LINE_STATEMENT_KEYWORD'][$strStmntKeyword] as $arrayMatchDtls) {
                         $arrayOccurence[] = vsprintf('line %d position %d', [
-                            $arrayMatchingDetails['whichLine'],
-                            $arrayMatchingDetails['whichPosition'],
+                            $arrayMatchDtls['whichLine'],
+                            $arrayMatchDtls['whichPosition'],
                         ]);
                     }
-                    echo vsprintf('<p style="color:red;">Single Line Statement Keyword %s seen but not by its own'
-                            . ' and this happened on line %s</p>', [
-                        $strStatementKeyword,
+                    echo vsprintf('<p style="color:red;">'
+                            . 'Single Line Statement Keyword %s seen but not by its own and this happened on line %s'
+                            . '</p>', [
+                        $strStmntKeyword,
                         implode(', ', $arrayOccurence),
                     ]);
                 }
