@@ -1,0 +1,115 @@
+.importantText, ul.tabbernav {
+  font-weight: bold;
+}
+.gradientLightGreyTopToWhiteBottom, ul.tabbernav li a {
+  /* Permalink - use to edit and share this gradient: https://colorzilla.com/gradient-editor/#c0c0c0 0,ffffff 100 */
+  background: #c0c0c0;
+  /* Old browsers */
+  background: -moz-linear-gradient(top, #c0c0c0 0%, #ffffff 100%);
+  /* FF3.6-15 */
+  background: -webkit-linear-gradient(top, #c0c0c0 0%, #ffffff 100%);
+  /* Chrome10-25,Safari5.1-6 */
+  background: linear-gradient(to bottom, #c0c0c0 0%, #ffffff 100%);
+  /* W3C, IE10 , FF16 , Chrome26 , Opera12 , Safari7  */
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#c0c0c0', endColorstr='#ffffff',GradientType=0);
+  /* IE6-9 */
+}
+.gradientYellowTopToWhiteBottom, ul.tabbernav li a:hover {
+  /* Permalink - use to edit and share this gradient: https://colorzilla.com/gradient-editor/#ffff00 0,ffffff 100 */
+  background: #ffff00;
+  /* Old browsers */
+  background: -moz-linear-gradient(top, #ffff00 0%, #ffffff 100%);
+  /* FF3.6-15 */
+  background: -webkit-linear-gradient(top, #ffff00 0%, #ffffff 100%);
+  /* Chrome10-25,Safari5.1-6 */
+  background: linear-gradient(to bottom, #ffff00 0%, #ffffff 100%);
+  /* W3C, IE10 , FF16 , Chrome26 , Opera12 , Safari7  */
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ffff00', endColorstr='#ffffff',GradientType=0);
+  /* IE6-9 */
+}
+.gradientOrangeTopToWhiteBottom, ul.tabbernav li.tabberactive a {
+  /* Permalink - use to edit and share this gradient: https://colorzilla.com/gradient-editor/#ffa500 0,ffffff 100 */
+  background: #ffa500;
+  /* Old browsers */
+  background: -moz-linear-gradient(top, #ffa500 0%, #ffffff 100%);
+  /* FF3.6-15 */
+  background: -webkit-linear-gradient(top, #ffa500 0%, #ffffff 100%);
+  /* Chrome10-25,Safari5.1-6 */
+  background: linear-gradient(to bottom, #ffa500 0%, #ffffff 100%);
+  /* W3C, IE10 , FF16 , Chrome26 , Opera12 , Safari7  */
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ffa500', endColorstr='#ffffff',GradientType=0);
+  /* IE6-9 */
+}
+.gradientTopRedToWhiteBottom, ul.tabbernav li.tabberactive a:hover {
+  /* Permalink - use to edit and share this gradient: https://colorzilla.com/gradient-editor/#ff0000 0,ffffff 100 */
+  background: #ff0000;
+  /* Old browsers */
+  background: -moz-linear-gradient(top, #ff0000 0%, #ffffff 100%);
+  /* FF3.6-15 */
+  background: -webkit-linear-gradient(top, #ff0000 0%, #ffffff 100%);
+  /* Chrome10-25,Safari5.1-6 */
+  background: linear-gradient(to bottom, #ff0000 0%, #ffffff 100%);
+  /* W3C, IE10 , FF16 , Chrome26 , Opera12 , Safari7  */
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ff0000', endColorstr='#ffffff',GradientType=0);
+  /* IE6-9 */
+}
+.tabber {
+  float: left;
+  overflow: auto;
+}
+.tabberlive {
+  margin-top: 16px;
+}
+ul.tabbernav {
+  border-bottom: 1px solid #ccc;
+  font-size: 12px;
+  margin: 0;
+  padding: 3px 0;
+}
+ul.tabbernav li {
+  list-style: none;
+  display: inline;
+  margin: 0;
+}
+ul.tabbernav li a {
+  border: 1px solid #ccc;
+  border-bottom: none;
+  border-top-left-radius: 5px;
+  border-top-right-radius: 5px;
+  font-weight: normal;
+  margin-left: 3px;
+  padding: 3px 8px;
+  text-decoration: none;
+}
+ul.tabbernav li a:hover {
+  border: 1px solid #ccc;
+  color: #000;
+}
+ul.tabbernav li a:link {
+  color: #448;
+}
+ul.tabbernav li a:visited {
+  color: #667;
+}
+ul.tabbernav li.tabberactive a {
+  border-bottom: 1px solid #fff;
+  font-weight: bold;
+}
+ul.tabbernav li.tabberactive a:hover {
+  border: 1px solid #ccc;
+  border-bottom: 1px solid #fff;
+  color: yellow;
+}
+.tabberlive .tabbertab {
+  border: 1px solid #ccc;
+  border-top: 0;
+  margin: 0;
+  padding: 10px;
+}
+.tabberlive#tab2 .tabbertab {
+  height: 200px;
+  overflow: auto;
+}
+.tabberlive .tabbertabhide, .tabberlive .tabbertab h2, .tabberlive .tabbertab h3 {
+  display: none;
+}

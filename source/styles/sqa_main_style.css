@@ -45,7 +45,8 @@ main {
 pre {
     counter-reset: line;
     max-height: 200px;
-    max-width: 800px;
+    max-width: 900px;
+    padding: 1em;
 }
 
 code {
