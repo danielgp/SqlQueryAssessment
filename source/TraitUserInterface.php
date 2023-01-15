@@ -40,7 +40,7 @@ trait TraitUserInterface
             $arrayWhichLines = array_column($arrayPenalties['EMPTY_LINE'], 'whichLine');
             if ($arrayWhichLines != []) {
                 echo vsprintf('<p style="color:red;">'
-                        . 'EMPTY lines were found on line(s) %s'
+                        . 'EMPTY lines were found: %s which have no values added and MUST be removed!'
                         . '</p>', [
                     implode(', ', $arrayWhichLines),
                 ]);
@@ -90,6 +90,18 @@ trait TraitUserInterface
                 }
             }
         }
+    }
+
+    public function displaySqlQueryType($arrayDetected)
+    {
+        echo vsprintf('<p style="color:green;">Query Type = %s which stands for %s.'
+                . '<br/><span style="font-size:0.6em;">'
+                . 'This determination was done by 1st keyword begin %s which %s.</span></p>', [
+            $arrayDetected['Type'],
+            $arrayDetected['Type Description'],
+            $arrayDetected['1st Keyword Within Query'],
+            $arrayDetected['Description'],
+        ]);
     }
 
     private function displayTabsAndSpacesInconsistency($arrayNumbers)

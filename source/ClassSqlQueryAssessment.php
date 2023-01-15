@@ -33,10 +33,11 @@ class ClassSqlQueryAssessment
         \danielgp\sql_query_assessment\TraitConfiguration,
         \danielgp\sql_query_assessment\TraitUserInterface;
 
-    private $arrayPenalties;
+    private $arrayNumbers;
     private $arraySqlFlavours;
     private $arrayNonVisibleCharactersMapping;
     private $flagMatch = PREG_OFFSET_CAPTURE | PREG_UNMATCHED_AS_NULL;
+    public $arrayPenalties;
 
     public function __construct()
     {
@@ -49,6 +50,29 @@ class ClassSqlQueryAssessment
             \IntlChar::chr(9)                                => \IntlChar::chr(\IntlChar::charFromName($strNames[9])),
         ];
         $this->arraySqlFlavours                 = $this->configurationStructure();
+    }
+
+    private function detectInconsistencyOnSpacesAndTabs($intFileNo, $intLineNo, $arrayLineAttributes)
+    {
+        if ($arrayLineAttributes['length'] != $arrayLineAttributes['lengthWithoutSpaces']) {
+            $this->arrayNumbers[$intFileNo]['Spaces'][] = [
+                'howMany'   => $arrayLineAttributes['length'] - $arrayLineAttributes['lengthWithoutSpaces'],
+                'whichLine' => ($intLineNo + 1),
+            ];
+        }
+        if ($arrayLineAttributes['length'] != $arrayLineAttributes['lengthWithoutTabs']) {
+            $this->arrayNumbers[$intFileNo]['Tabs'][] = [
+                'howMany'   => $arrayLineAttributes['length'] - $arrayLineAttributes['lengthWithoutTabs'],
+                'whichLine' => ($intLineNo + 1),
+            ];
+        }
+        if ($arrayLineAttributes['length'] !== $arrayLineAttributes['lengthRightTrimmed']) {
+            echo ', trailling spaces seen... :-(';
+            $this->arrayPenalties[$intFileNo]['TRAILLING_SPACES_OR_TABS'][] = [
+                'howMany'   => ($arrayLineAttributes['length'] - $arrayLineAttributes['lengthRightTrimmed']),
+                'whichLine' => ($intLineNo + 1),
+            ];
+        }
     }
 
     private function detectOperators($strSqlFlavour, $intFileNo, $intLineNo, $arrayLineAttributes)
@@ -120,32 +144,15 @@ class ClassSqlQueryAssessment
         return $this->getMySQLqueryType($strQueryContent);
     }
 
-    public function displaySqlQueryType($arrayDetected)
-    {
-        echo vsprintf('<p style="color:green;">Given query has been detected to be %s which stands for %s.'
-                . '<span style="font-size:0.6em;">'
-                . 'This determination was done by 1st keyword begin %s which %s.</span></p>', [
-            $arrayDetected['Type'],
-            $arrayDetected['Type Description'],
-            $arrayDetected['1st Keyword Within Query'],
-            $arrayDetected['Description'],
-        ]);
-    }
-
-    public function evaluateSqlQuery($strSqlFlavour, $strQueryType, $intFileNo, $arrayQueryLines)
+    public function evaluateSqlQuery($strSqlFlavour, $intFileNo, $arrayQueryLines)
     {
         $arrayQueryLinesEnhanced = $this->packArrayWithQueryLines($arrayQueryLines);
-        $arrayNumbers            = [];
         $longTotalLength         = 0;
-        $arrayOperatorsKind      = array_keys($this->arraySqlFlavours['MySQL']['Operators']);
-        echo '<pre>';
         foreach ($arrayQueryLinesEnhanced as $intLineNo => $arrayLineAttributes) {
-            echo '<code>';
-            echo $this->setContentWithAllCharactersVisible($arrayLineAttributes['content']);
+            echo '<code>' . $this->setContentWithAllCharactersVisible($arrayLineAttributes['content']);
             $longTotalLength += $arrayLineAttributes['length'];
             echo '<span style="color:#888;font-style:italic;font-size:0.5em;">'
-            . '=> length=' . $arrayLineAttributes['length']
-            . ', EOL length=' . $longTotalLength
+            . '=> length=' . $arrayLineAttributes['length'] . ', EOL length=' . $longTotalLength
             . ', Indentation=' . $arrayLineAttributes['indentation'];
             if ($arrayLineAttributes['lengthTrimmed'] == 0) {
                 echo ', Empty line';
@@ -156,31 +163,17 @@ class ClassSqlQueryAssessment
                 $this->detectStatements($strSqlFlavour, $intFileNo, $intLineNo, $arrayLineAttributes);
                 $this->detectOperators($strSqlFlavour, $intFileNo, $intLineNo, $arrayLineAttributes);
             }
-            if ($arrayLineAttributes['length'] != $arrayLineAttributes['lengthWithoutSpaces']) {
-                $arrayNumbers['Spaces'][] = [
-                    'howMany'   => $arrayLineAttributes['length'] - $arrayLineAttributes['lengthWithoutSpaces'],
-                    'whichLine' => ($intLineNo + 1),
-                ];
-            }
-            if ($arrayLineAttributes['length'] != $arrayLineAttributes['lengthWithoutTabs']) {
-                $arrayNumbers['Tabs'][] = [
-                    'howMany'   => $arrayLineAttributes['length'] - $arrayLineAttributes['lengthWithoutTabs'],
-                    'whichLine' => ($intLineNo + 1),
-                ];
-            }
-            if ($arrayLineAttributes['length'] !== $arrayLineAttributes['lengthRightTrimmed']) {
-                echo ', trailling spaces seen... :-(';
-                $this->arrayPenalties[$intFileNo]['TRAILLING_SPACES_OR_TABS'][] = [
-                    'howMany'   => ($arrayLineAttributes['length'] - $arrayLineAttributes['lengthRightTrimmed']),
-                    'whichLine' => ($intLineNo + 1),
-                ];
-            }
-            echo '</span>' . '</code>' . '<br/>';
+            $this->detectInconsistencyOnSpacesAndTabs($intFileNo, $intLineNo, $arrayLineAttributes);
+            echo '</span></code><br/>';
         }
-        echo '</pre>';
+    }
+
+    public function displayIssuesFound($strSqlFlavour, $intFileNo, $arrayDetected)
+    {
+        $this->displaySqlQueryType($arrayDetected);
         $this->displayTrailingSpaces($this->arrayPenalties[$intFileNo]);
         $this->displaySingleLineStatementKeyword($strSqlFlavour, $this->arrayPenalties[$intFileNo]);
-        $this->displayTabsAndSpacesInconsistency($arrayNumbers);
+        $this->displayTabsAndSpacesInconsistency($this->arrayNumbers[$intFileNo]);
         $this->displayEmptyLines($this->arrayPenalties[$intFileNo]);
         $this->displayOperatorsImproper($this->arrayPenalties[$intFileNo]);
     }
