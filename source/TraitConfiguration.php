@@ -41,7 +41,7 @@ trait TraitConfiguration
                         '<=',
                     ],
                     'Single'    => [
-                        '[^!<>]\=',
+                        '[^!<>\s]\=',
                         '\+',
                         '\-',
                     ],
