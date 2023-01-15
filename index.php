@@ -38,12 +38,12 @@ $strInputFiles = [
     $app->strMainFolder . 'tests\\simple_query.sql',
     $app->strMainFolder . 'tests\\single_line_query.sql'
 ];
-foreach ($strInputFiles as $strInputFile) {
+foreach ($strInputFiles as $intFileNo => $strInputFile) {
     $arrayQueryLines = $app->getQueryForAssessmentToArray($strInputFile);
     if ($arrayQueryLines != []) {
         $arrayDetected = $app->getSqlQueryType(implode(' ', $arrayQueryLines));
         $app->displaySqlQueryType($arrayDetected);
-        $app->evaluateSqlQuery('MySQL', $arrayDetected['Type'], $arrayQueryLines);
+        $app->evaluateSqlQuery('MySQL', $arrayDetected['Type'], $intFileNo, $arrayQueryLines);
     }
     echo '<hr/>';
 }
