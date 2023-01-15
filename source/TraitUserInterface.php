@@ -92,6 +92,52 @@ trait TraitUserInterface
         }
     }
 
+    private function displayTabsAndSpacesInconsistency($arrayNumbers)
+    {
+        $intHowManySpaces = 0;
+        $intHowManyTabs   = 0;
+        $arrayWhere       = [
+            'Spaces' => [],
+            'Tabs'   => [],
+        ];
+        if (array_key_exists('Spaces', $arrayNumbers)) {
+            foreach ($arrayNumbers['Spaces'] as $arrayMatchingDetails) {
+                $intHowManySpaces       += $arrayMatchingDetails['howMany'];
+                $arrayWhere['Spaces'][] = $arrayMatchingDetails['whichLine'];
+            }
+        }
+        if (array_key_exists('Tabs', $arrayNumbers)) {
+            foreach ($arrayNumbers['Tabs'] as $arrayMatchingDetails) {
+                $intHowManyTabs       += $arrayMatchingDetails['howMany'];
+                $arrayWhere['Tabs'][] = $arrayMatchingDetails['whichLine'];
+            }
+        }
+        if (($intHowManySpaces !== 0) && ($intHowManyTabs !== 0)) {
+            echo vsprintf('<p style="color:red;">Since a combination of both SPACES (%s) and TABS (%s)'
+                    . ' were found to be present, this is considered a unacceptable inconsistency!</p>', [
+                $intHowManySpaces . ' at lines ' . implode(', ', $arrayWhere['Spaces']),
+                $intHowManyTabs . ' at lines ' . implode(', ', $arrayWhere['Tabs']),
+            ]);
+        }
+    }
+
+    private function displayTrailingSpaces($arrayPenalties)
+    {
+        if (!is_null($arrayPenalties) && array_key_exists('TRAILLING_SPACES_OR_TABS', $arrayPenalties)) {
+            $intHowMany = 0;
+            $arrayWhere = [];
+            foreach ($arrayPenalties['TRAILLING_SPACES_OR_TABS'] as $arrayMatchingDetails) {
+                $intHowMany   += $arrayMatchingDetails['howMany'];
+                $arrayWhere[] = $arrayMatchingDetails['whichLine'];
+            }
+            echo vsprintf('<p style="color:red;">There are %d trailling spaces present at lines %s'
+                    . ' and this is considered a unacceptable as all these characters are just wasted</p>', [
+                $intHowMany,
+                implode(', ', $arrayWhere),
+            ]);
+        }
+    }
+
     public function initiateUserInterface()
     {
         $this->classTimer         = new \SebastianBergmann\Timer\Timer;
