@@ -14,3 +14,4 @@ Assesses SQL Query statements against customizable best practices formatting
 
 # Useful references
 [BootstrapIntroduction](https://getbootstrap.com/docs/5.2/getting-started/introduction/)
+[Minifier on-line](https://www.minifier.org/)
