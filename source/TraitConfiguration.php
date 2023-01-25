@@ -47,12 +47,12 @@ trait TraitConfiguration
                     ],
                 ],
                 'Single Line Statement Keywords' => [
-                    'WITH',
-                    'SELECT',
-                    'FROM',
+                    '[^_]WITH[^_]',
+                    'SELECT[^*\sFROM]',
+                    '[^\'.*]FROM',
                     'WHERE',
                     'GROUP BY',
-                    'ORDER BY',
+                    '[^PARTITION BY.*\s]ORDER BY',
                     'HAVING',
                 ],
                 'Statement Keywords'             => [

@@ -48,6 +48,45 @@ trait TraitUserInterface
         }
     }
 
+    public function displayIssuesFound($strSqlFlavour, $intFileNo, $arrayDetected)
+    {
+        $this->displaySqlQueryType($arrayDetected);
+        $this->displayTrailingSpaces($this->arrayPenalties[$intFileNo]);
+        $this->displaySingleLineStatementKeyword($strSqlFlavour, $this->arrayPenalties[$intFileNo]);
+        $this->displayTabsAndSpacesInconsistency($this->arrayNumbers[$intFileNo]);
+        $this->displayEmptyLines($this->arrayPenalties[$intFileNo]);
+        $this->displayOperatorsImproper($this->arrayPenalties[$intFileNo]);
+        $this->displaySeparatorImproper($this->arrayPenalties[$intFileNo]);
+    }
+
+    private function displaySeparatorImproper($arrayPenalties)
+    {
+        $arrayKnownFaults = [
+            'Un-necesary SPACE BEFORE and Missing SPACE AFTER',
+            'Just Un-necesary SPACE BEFORE',
+            'Just Missing SPACE AFTER',
+        ];
+        if (!is_null($arrayPenalties) && array_key_exists('SEPARATOR', $arrayPenalties)) {
+            foreach ($arrayKnownFaults as $strFault) {
+                if (array_key_exists($strFault, $arrayPenalties['SEPARATOR'])) {
+                    $arrayOccurence = [];
+                    foreach ($arrayPenalties['SEPARATOR'][$strFault] as $arrayMatchDtls) {
+                        $arrayOccurence[] = vsprintf('line %d position %d', [
+                            $arrayMatchDtls['whichLine'],
+                            $arrayMatchDtls['whichPosition'],
+                        ]);
+                    }
+                    echo vsprintf('<p style="color:red;">'
+                            . 'Separator with FAULT = &quot;%s&quot; seen on %s'
+                            . '</p>', [
+                        $strFault,
+                        implode(', ', $arrayOccurence),
+                    ]);
+                }
+            }
+        }
+    }
+
     private function displayOperatorsImproper($arrayPenalties)
     {
         if (!is_null($arrayPenalties) && array_key_exists('OPERATOR', $arrayPenalties)) {
