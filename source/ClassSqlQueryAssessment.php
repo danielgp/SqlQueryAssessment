@@ -177,11 +177,12 @@ class ClassSqlQueryAssessment
         $arrayQueryLinesEnhanced = $this->packArrayWithQueryLines($arrayQueryLines);
         $longTotalLength         = 0;
         foreach ($arrayQueryLinesEnhanced as $intLineNo => $arrayLineAttributes) {
-            echo '<code>' . $this->setContentWithAllCharactersVisible($arrayLineAttributes['content']);
             $longTotalLength += $arrayLineAttributes['length'];
-            echo '<span style="color:#888;font-style:italic;font-size:0.5em;">'
-            . '=> length=' . $arrayLineAttributes['length'] . ', EOL length=' . $longTotalLength
-            . ', Indentation=' . $arrayLineAttributes['indentation'];
+            echo ($intLineNo = 0 ? '' : '<br/>') . '<code>'
+                . $this->setContentWithAllCharactersVisible($arrayLineAttributes['content'])
+                . '<span style="color:#888;font-style:italic;font-size:0.5em;">'
+                . '=> length=' . $arrayLineAttributes['length'] . ', EOL length=' . $longTotalLength
+                . ', Indentation=' . $arrayLineAttributes['indentation'];
             if ($arrayLineAttributes['lengthTrimmed'] == 0) {
                 echo ', Empty line';
                 $this->arrayPenalties[$intFileNo]['EMPTY_LINE'][] = [
@@ -193,7 +194,7 @@ class ClassSqlQueryAssessment
                 $this->detectSeparator($intFileNo, $intLineNo, $arrayLineAttributes);
             }
             $this->detectInconsistencyOnSpacesAndTabs($intFileNo, $intLineNo, $arrayLineAttributes);
-            echo '</span></code><br/>';
+            echo '</span></code>';
         }
     }
 

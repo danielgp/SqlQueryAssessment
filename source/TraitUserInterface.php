@@ -213,7 +213,7 @@ trait TraitUserInterface
         echo vsprintf($strHtmlContent, [
             $this->arrayConfiguration['name'],
             $this->arrayConfiguration['authors'][0]['name'],
-            $this->arrayConfiguration['name'],
+            'SQL Query Assessment',
         ]);
     }
 
