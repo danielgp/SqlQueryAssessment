@@ -52,60 +52,60 @@ class ClassSqlQueryAssessment
         $this->arraySqlFlavours                 = $this->configurationStructure();
     }
 
-    private function detectInconsistencyOnSpacesAndTabs(int $intFileNo, int $intLineNo, array $arrayLineAttributes): void
+    private function detectInconsistencyOnSpacesAndTabs(int $intFileNo, int $intLineNo, array $arrayLineAttr): void
     {
-        if ($arrayLineAttributes['length'] != $arrayLineAttributes['lengthWithoutSpaces']) {
+        if ($arrayLineAttr['length'] != $arrayLineAttr['lengthWithoutSpaces']) {
             $this->arrayNumbers[$intFileNo]['Spaces'][] = [
-                'howMany'   => $arrayLineAttributes['length'] - $arrayLineAttributes['lengthWithoutSpaces'],
+                'howMany'   => $arrayLineAttr['length'] - $arrayLineAttr['lengthWithoutSpaces'],
                 'whichLine' => ($intLineNo + 1),
             ];
         }
-        if ($arrayLineAttributes['length'] != $arrayLineAttributes['lengthWithoutTabs']) {
+        if ($arrayLineAttr['length'] != $arrayLineAttr['lengthWithoutTabs']) {
             $this->arrayNumbers[$intFileNo]['Tabs'][] = [
-                'howMany'   => $arrayLineAttributes['length'] - $arrayLineAttributes['lengthWithoutTabs'],
+                'howMany'   => $arrayLineAttr['length'] - $arrayLineAttr['lengthWithoutTabs'],
                 'whichLine' => ($intLineNo + 1),
             ];
         }
-        if ($arrayLineAttributes['length'] !== $arrayLineAttributes['lengthRightTrimmed']) {
+        if ($arrayLineAttr['length'] !== $arrayLineAttr['lengthRightTrimmed']) {
             echo ', trailling spaces seen... :-(';
             $this->arrayPenalties[$intFileNo]['TRAILLING_SPACES_OR_TABS'][] = [
-                'howMany'   => ($arrayLineAttributes['length'] - $arrayLineAttributes['lengthRightTrimmed']),
+                'howMany'   => ($arrayLineAttr['length'] - $arrayLineAttr['lengthRightTrimmed']),
                 'whichLine' => ($intLineNo + 1),
             ];
         }
     }
 
-    private function detectOperators(string $strSqlFlavour, int $intFileNo, int $intLineNo, array $arrayLineAttributes): void
+    private function detectOperators(string $strSqlFlavr, int $intFileNo, int $intLineNo, array $arrayLineAttr): void
     {
         $arrayMatchesCoOp   = [];
         $arrayOperatorsKind = array_keys($this->arraySqlFlavours['MySQL']['Operators']);
         foreach ($arrayOperatorsKind as $strOperatorKind) {
             $strRegCoOp = '/('
-                    . implode('|', $this->arraySqlFlavours[$strSqlFlavour]['Operators'][$strOperatorKind]) . ')/i';
-            preg_match_all($strRegCoOp, $arrayLineAttributes['content'], $arrayMatchesCoOp, $this->flagMatch);
+                    . implode('|', $this->arraySqlFlavours[$strSqlFlavr]['Operators'][$strOperatorKind]) . ')/i';
+            preg_match_all($strRegCoOp, $arrayLineAttr['content'], $arrayMatchesCoOp, $this->flagMatch);
             unset($strRegCoOp);
             if ($arrayMatchesCoOp[0] != []) {
                 foreach ($arrayMatchesCoOp[0] as $intMatchNo => $arrayMatchDetails) {
-                    $strCharacterBefore  = substr($arrayLineAttributes['content'], $arrayMatchDetails[1] - 1, 1);
-                    $intPositionAfter    = $arrayMatchDetails[1] + strlen($arrayMatchDetails[0]);
-                    $strCharacterAfter   = substr($arrayLineAttributes['content'], $intPositionAfter, 1);
-                    $strCharacterBefore2 = substr($arrayLineAttributes['content'], $arrayMatchDetails[1] - 3, 1);
-                    $strCharacterAfter2  = substr($arrayLineAttributes['content'], $intPositionAfter + 2, 1);
-                    if (($arrayMatchDetails[0] === '-') && (($strCharacterBefore === '-') || ($strCharacterAfter === '-') || ($strCharacterBefore2 === '-') || ($strCharacterAfter2 === '-') || (in_array(ord($strCharacterBefore), array_keys(array_fill(ord('a'), 26, true)))) || (in_array(ord($strCharacterAfter), array_keys(array_fill(ord('a'), 26, true)))) || (in_array(ord($strCharacterBefore), array_keys(array_fill(ord('A'), 26, true)))) || (in_array(ord($strCharacterAfter), array_keys(array_fill(ord('A'), 26, true)))) || (ord($strCharacterAfter) === ord("'")))) {
+                    $strCharBefore  = substr($arrayLineAttr['content'], $arrayMatchDetails[1] - 1, 1);
+                    $intPosAfter    = $arrayMatchDetails[1] + strlen($arrayMatchDetails[0]);
+                    $strCharAfter   = substr($arrayLineAttr['content'], $intPosAfter, 1);
+                    $strCharBefore2 = substr($arrayLineAttr['content'], $arrayMatchDetails[1] - 3, 1);
+                    $strCharAfter2  = substr($arrayLineAttr['content'], $intPosAfter + 2, 1);
+                    if (($arrayMatchDetails[0] === '-') && (($strCharBefore === '-') || ($strCharAfter === '-') || ($strCharBefore2 === '-') || ($strCharAfter2 === '-') || (in_array(ord($strCharBefore), array_keys(array_fill(ord('a'), 26, true)))) || (in_array(ord($strCharAfter), array_keys(array_fill(ord('a'), 26, true)))) || (in_array(ord($strCharBefore), array_keys(array_fill(ord('A'), 26, true)))) || (in_array(ord($strCharAfter), array_keys(array_fill(ord('A'), 26, true)))) || (ord($strCharAfter) === ord("'")))) {
                         // do nothing as this is an inline comment OR a date
-                    } elseif (($strCharacterBefore != ' ') && ($strCharacterAfter != ' ')) {
+                    } elseif (($strCharBefore != ' ') && ($strCharAfter != ' ')) {
                         $this->arrayPenalties[$intFileNo]['OPERATOR'][$arrayMatchDetails[0]][] = [
                             'fault'         => 'MISSING BOTH SPACES',
                             'whichLine'     => ($intLineNo + 1),
                             'whichPosition' => $arrayMatchDetails[1] + 1,
                         ];
-                    } elseif ($strCharacterBefore != ' ') {
+                    } elseif ($strCharBefore != ' ') {
                         $this->arrayPenalties[$intFileNo]['OPERATOR'][$arrayMatchDetails[0]][] = [
                             'fault'         => 'MISSING SPACE BEFORE',
                             'whichLine'     => ($intLineNo + 1),
                             'whichPosition' => $arrayMatchDetails[1],
                         ];
-                    } elseif ($strCharacterAfter != ' ') {
+                    } elseif ($strCharAfter != ' ') {
                         $this->arrayPenalties[$intFileNo]['OPERATOR'][$arrayMatchDetails[0]][] = [
                             'fault'         => 'MISSING SPACE AFTER',
                             'whichLine'     => ($intLineNo + 1),
@@ -117,28 +117,28 @@ class ClassSqlQueryAssessment
         }
     }
 
-    private function detectSeparator(int $intFileNo, int $intLineNo, array $arrayLineAttributes): void
+    private function detectSeparator(int $intFileNo, int $intLineNo, array $arrayLineAttr): void
     {
         $arrayMatches = [];
         $strReg       = '/,/i';
-        preg_match_all($strReg, $arrayLineAttributes['content'], $arrayMatches, $this->flagMatch);
+        preg_match_all($strReg, $arrayLineAttr['content'], $arrayMatches, $this->flagMatch);
         unset($strReg);
         if ($arrayMatches[0] != []) {
             foreach ($arrayMatches[0] as $arrayMatchDetails) {
-                $strCharacterBefore = substr($arrayLineAttributes['content'], $arrayMatchDetails[1] - 1, 1);
-                $intPositionAfter   = $arrayMatchDetails[1] + strlen($arrayMatchDetails[0]);
-                $strCharacterAfter  = substr($arrayLineAttributes['content'], $intPositionAfter, 1);
-                if (($strCharacterBefore === ' ') && ($strCharacterAfter !== ' ') && ($arrayLineAttributes['length'] != $intPositionAfter)) {
+                $strCharBefore = substr($arrayLineAttr['content'], $arrayMatchDetails[1] - 1, 1);
+                $intPosAfter   = $arrayMatchDetails[1] + strlen($arrayMatchDetails[0]);
+                $strCharAfter  = substr($arrayLineAttr['content'], $intPosAfter, 1);
+                if (($strCharBefore === ' ') && ($strCharAfter !== ' ') && ($arrayLineAttr['length'] != $intPosAfter)) {
                     $this->arrayPenalties[$intFileNo]['SEPARATOR']['Un-necesary SPACE BEFORE and Missing SPACE AFTER'][] = [
                         'whichLine'     => ($intLineNo + 1),
                         'whichPosition' => $arrayMatchDetails[1] + 1,
                     ];
-                } elseif (($strCharacterBefore === ' ') && (str_replace(' ', '', substr($arrayLineAttributes['content'], 0, $arrayMatchDetails[1])) != '')) {
+                } elseif (($strCharBefore === ' ') && (str_replace(' ', '', substr($arrayLineAttr['content'], 0, $arrayMatchDetails[1])) != '')) {
                     $this->arrayPenalties[$intFileNo]['SEPARATOR']['Just Un-necesary SPACE BEFORE'][] = [
                         'whichLine'     => ($intLineNo + 1),
                         'whichPosition' => $arrayMatchDetails[1] + 1,
                     ];
-                } elseif (($strCharacterAfter !== ' ') && ($strCharacterAfter !== '"') && ($arrayLineAttributes['length'] != $intPositionAfter)) {
+                } elseif (($strCharAfter !== ' ') && ($strCharAfter !== '"') && ($arrayLineAttr['length'] != $intPosAfter)) {
                     $this->arrayPenalties[$intFileNo]['SEPARATOR']['Just Missing SPACE AFTER'][] = [
                         'whichLine'     => ($intLineNo + 1),
                         'whichPosition' => $arrayMatchDetails[1] + 1,
@@ -148,16 +148,16 @@ class ClassSqlQueryAssessment
         }
     }
 
-    private function detectStatements(string $strSqlFlavour, int $intFileNo, int $intLineNo, array $arrayLineAttributes): void
+    private function detectStatements(string $strSqlFlavour, int $intFileNo, int $intLineNo, array $arrayLineAttr): void
     {
         $arrayMatches = [];
         $strReg       = '/('
                 . implode('|', $this->arraySqlFlavours[$strSqlFlavour]['Statement Keywords']) . ')/i';
-        preg_match_all($strReg, $arrayLineAttributes['content'], $arrayMatches, $this->flagMatch);
+        preg_match_all($strReg, $arrayLineAttr['content'], $arrayMatches, $this->flagMatch);
         unset($strReg);
         if ($arrayMatches[0] != []) {
             foreach ($arrayMatches[0] as $arrayMatchDetails) {
-                if ((in_array(strtoupper($arrayMatchDetails[0]), $this->arraySqlFlavours[$strSqlFlavour]['Single Line Statement Keywords'])) && ($arrayLineAttributes['contentTrimmed'] !== $arrayMatchDetails[0])) {
+                if ((in_array(strtoupper($arrayMatchDetails[0]), $this->arraySqlFlavours[$strSqlFlavour]['Single Line Statement Keywords'])) && ($arrayLineAttr['contentTrimmed'] !== $arrayMatchDetails[0])) {
                     $this->arrayPenalties[$intFileNo]['SINGLE_LINE_STATEMENT_KEYWORD'][strtoupper($arrayMatchDetails[0])][] = [
                         'whichLine'     => ($intLineNo + 1),
                         'whichPosition' => $arrayMatchDetails[1],
