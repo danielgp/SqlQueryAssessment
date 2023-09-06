@@ -34,7 +34,7 @@ trait TraitUserInterface
     private $arrayConfiguration;
     public $strMainFolder;
 
-    private function displayEmptyLines($arrayPenalties)
+    private function displayEmptyLines(array|null $arrayPenalties): void
     {
         if (!is_null($arrayPenalties) && array_key_exists('EMPTY_LINE', $arrayPenalties)) {
             $arrayWhichLines = array_column($arrayPenalties['EMPTY_LINE'], 'whichLine');
@@ -48,7 +48,7 @@ trait TraitUserInterface
         }
     }
 
-    public function displayIssuesFound($strSqlFlavour, $intFileNo, $arrayDetected)
+    public function displayIssuesFound(string $strSqlFlavour, int $intFileNo, array $arrayDetected): void
     {
         $this->displaySqlQueryType($arrayDetected);
         $this->displayTrailingSpaces($this->arrayPenalties[$intFileNo]);
@@ -59,7 +59,7 @@ trait TraitUserInterface
         $this->displaySeparatorImproper($this->arrayPenalties[$intFileNo]);
     }
 
-    private function displaySeparatorImproper($arrayPenalties)
+    private function displaySeparatorImproper(array $arrayPenalties): void
     {
         $arrayKnownFaults = [
             'Un-necesary SPACE BEFORE and Missing SPACE AFTER',
@@ -87,7 +87,7 @@ trait TraitUserInterface
         }
     }
 
-    private function displayOperatorsImproper($arrayPenalties)
+    private function displayOperatorsImproper(array $arrayPenalties): void
     {
         if (!is_null($arrayPenalties) && array_key_exists('OPERATOR', $arrayPenalties)) {
             foreach ($arrayPenalties['OPERATOR'] as $strOperator => $arrayMatchingDetails) {
@@ -108,7 +108,7 @@ trait TraitUserInterface
         }
     }
 
-    private function displaySingleLineStatementKeyword($strSqlFlavour, $arrayPenalties)
+    private function displaySingleLineStatementKeyword(string $strSqlFlavour, array $arrayPenalties): void
     {
         if (!is_null($arrayPenalties) && array_key_exists('SINGLE_LINE_STATEMENT_KEYWORD', $arrayPenalties)) {
             foreach ($this->arraySqlFlavours[$strSqlFlavour]['Single Line Statement Keywords'] as $strStmntKeyword) {
@@ -131,7 +131,7 @@ trait TraitUserInterface
         }
     }
 
-    public function displaySqlQueryType($arrayDetected)
+    public function displaySqlQueryType(array $arrayDetected): void
     {
         echo vsprintf('<p style="color:green;">Query Type = %s which stands for %s.'
                 . '<br/><span style="font-size:0.6em;">'
@@ -143,7 +143,7 @@ trait TraitUserInterface
         ]);
     }
 
-    private function displayTabsAndSpacesInconsistency($arrayNumbers)
+    private function displayTabsAndSpacesInconsistency(array $arrayNumbers): void
     {
         $intHowManySpaces = 0;
         $intHowManyTabs   = 0;
@@ -172,7 +172,7 @@ trait TraitUserInterface
         }
     }
 
-    private function displayTrailingSpaces($arrayPenalties)
+    private function displayTrailingSpaces(array|null $arrayPenalties): void
     {
         if (!is_null($arrayPenalties) && array_key_exists('TRAILLING_SPACES_OR_TABS', $arrayPenalties)) {
             $intHowMany = 0;
@@ -189,7 +189,7 @@ trait TraitUserInterface
         }
     }
 
-    public function initiateUserInterface()
+    public function initiateUserInterface(): void
     {
         $this->classTimer         = new \SebastianBergmann\Timer\Timer;
         $this->classTimer->start();

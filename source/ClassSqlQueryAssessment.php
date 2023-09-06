@@ -52,7 +52,7 @@ class ClassSqlQueryAssessment
         $this->arraySqlFlavours                 = $this->configurationStructure();
     }
 
-    private function detectInconsistencyOnSpacesAndTabs($intFileNo, $intLineNo, $arrayLineAttributes)
+    private function detectInconsistencyOnSpacesAndTabs(int $intFileNo, int $intLineNo, array $arrayLineAttributes): void
     {
         if ($arrayLineAttributes['length'] != $arrayLineAttributes['lengthWithoutSpaces']) {
             $this->arrayNumbers[$intFileNo]['Spaces'][] = [
@@ -75,7 +75,7 @@ class ClassSqlQueryAssessment
         }
     }
 
-    private function detectOperators($strSqlFlavour, $intFileNo, $intLineNo, $arrayLineAttributes)
+    private function detectOperators(string $strSqlFlavour, int $intFileNo, int $intLineNo, array $arrayLineAttributes): void
     {
         $arrayMatchesCoOp   = [];
         $arrayOperatorsKind = array_keys($this->arraySqlFlavours['MySQL']['Operators']);
@@ -117,7 +117,7 @@ class ClassSqlQueryAssessment
         }
     }
 
-    private function detectSeparator($intFileNo, $intLineNo, $arrayLineAttributes)
+    private function detectSeparator(int $intFileNo, int $intLineNo, array $arrayLineAttributes): void
     {
         $arrayMatches = [];
         $strReg       = '/,/i';
@@ -148,7 +148,7 @@ class ClassSqlQueryAssessment
         }
     }
 
-    private function detectStatements($strSqlFlavour, $intFileNo, $intLineNo, $arrayLineAttributes)
+    private function detectStatements(string $strSqlFlavour, int $intFileNo, int $intLineNo, array $arrayLineAttributes): void
     {
         $arrayMatches = [];
         $strReg       = '/('
@@ -167,18 +167,18 @@ class ClassSqlQueryAssessment
         }
     }
 
-    public function getSqlQueryType($strQueryContent)
+    public function getSqlQueryType(string $strQueryContent): array
     {
         return $this->getMySQLqueryType($strQueryContent);
     }
 
-    public function evaluateSqlQuery($strSqlFlavour, $intFileNo, $arrayQueryLines)
+    public function evaluateSqlQuery(string $strSqlFlavour, int $intFileNo, array $arrayQueryLines): void
     {
         $arrayQueryLinesEnhanced = $this->packArrayWithQueryLines($arrayQueryLines);
         $longTotalLength         = 0;
         foreach ($arrayQueryLinesEnhanced as $intLineNo => $arrayLineAttributes) {
             $longTotalLength += $arrayLineAttributes['length'];
-            echo ($intLineNo = 0 ? '' : '<br/>') . '<code>'
+            echo ($intLineNo == 0 ? '' : '<br/>') . '<code>'
                 . $this->setContentWithAllCharactersVisible($arrayLineAttributes['content'])
                 . '<span style="color:#888;font-style:italic;font-size:0.5em;">'
                 . '=> length=' . $arrayLineAttributes['length'] . ', EOL length=' . $longTotalLength
@@ -198,7 +198,7 @@ class ClassSqlQueryAssessment
         }
     }
 
-    public function getQueryForAssessmentToArray($strInputFile): array
+    public function getQueryForAssessmentToArray(string $strInputFile): array
     {
         $contentInputFile = file($strInputFile, FILE_IGNORE_NEW_LINES);
         if ($contentInputFile === false) {
@@ -207,7 +207,7 @@ class ClassSqlQueryAssessment
         return $contentInputFile;
     }
 
-    private function packArrayWithQueryLines($arrayQueryLines)
+    private function packArrayWithQueryLines(array $arrayQueryLines): array
     {
         $arrayQueryLinesEnhanced = [];
         foreach ($arrayQueryLines as $intLineNo => $strLineContent) {
@@ -227,7 +227,7 @@ class ClassSqlQueryAssessment
         return $arrayQueryLinesEnhanced;
     }
 
-    private function setContentWithAllCharactersVisible($strContent): string
+    private function setContentWithAllCharactersVisible(string $strContent): string
     {
         $arrayReplace = [
             array_keys($this->arrayNonVisibleCharactersMapping),
@@ -236,7 +236,7 @@ class ClassSqlQueryAssessment
         return str_replace($arrayReplace[0], $arrayReplace[1], $strContent);
     }
 
-    private function setVisualStyleForNonVisibleCharacters($arrayInputStrings): array
+    private function setVisualStyleForNonVisibleCharacters(array $arrayInputStrings): array
     {
         $arrayStrings = [];
         foreach ($arrayInputStrings as $strInputString) {

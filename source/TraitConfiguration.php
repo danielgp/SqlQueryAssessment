@@ -29,7 +29,7 @@ namespace danielgp\sql_query_assessment;
 trait TraitConfiguration
 {
 
-    private function configurationStructure()
+    private function configurationStructure(): array
     {
         return [
             'MySQL' => [

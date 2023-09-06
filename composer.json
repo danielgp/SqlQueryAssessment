@@ -19,7 +19,7 @@
     },
     "autoload": {
         "psr-4": {
-            "danielgp\\sql_query_assessment\\":  "source/"
+            "danielgp\\sql_query_assessment\\": "source/"
         }
     },
     "minimum-stability": "stable",
