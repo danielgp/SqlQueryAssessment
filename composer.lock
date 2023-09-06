@@ -8,21 +8,21 @@
     "packages": [
         {
             "name": "danielgp/io-operations",
-            "version": "1.1.5",
+            "version": "1.1.6",
             "source": {
                 "type": "git",
                 "url": "https://github.com/danielgp/io-operations.git",
-                "reference": "50125ab88cc82b5c0c7301544c866fc5920d9b82"
+                "reference": "8e6a91eb72eb766974197139c5a0357e6ff91835"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/danielgp/io-operations/zipball/50125ab88cc82b5c0c7301544c866fc5920d9b82",
-                "reference": "50125ab88cc82b5c0c7301544c866fc5920d9b82",
+                "url": "https://api.github.com/repos/danielgp/io-operations/zipball/8e6a91eb72eb766974197139c5a0357e6ff91835",
+                "reference": "8e6a91eb72eb766974197139c5a0357e6ff91835",
                 "shasum": ""
             },
             "require": {
                 "ext-json": "*",
-                "php": "^5.4 || ^5.5 || ^5.6 || ^7.0 || ^7.1 || ^7.2 || ^7.3 || ^7.4 || ^8.0 || ^8.1"
+                "php": "^5.4 || ^5.5 || ^5.6 || ^7.0 || ^7.1 || ^7.2 || ^7.3 || ^7.4 || ^8.0 || ^8.1 || ^8.2"
             },
             "type": "library",
             "autoload": {
@@ -53,22 +53,22 @@
             "description": "to support various Input/Output operations",
             "support": {
                 "issues": "https://github.com/danielgp/io-operations/issues",
-                "source": "https://github.com/danielgp/io-operations/tree/1.1.5"
+                "source": "https://github.com/danielgp/io-operations/tree/1.1.6"
             },
-            "time": "2022-12-04T19:24:09+00:00"
+            "time": "2023-05-14T17:26:22+00:00"
         },
         {
             "name": "fortawesome/font-awesome",
-            "version": "6.2.1",
+            "version": "6.4.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/FortAwesome/Font-Awesome.git",
-                "reference": "96cafbd73ec4339b8c73c36673ce1518db82cc5c"
+                "reference": "f0c25837a3fe0e03783b939559e088abcbfb3c4b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/FortAwesome/Font-Awesome/zipball/96cafbd73ec4339b8c73c36673ce1518db82cc5c",
-                "reference": "96cafbd73ec4339b8c73c36673ce1518db82cc5c",
+                "url": "https://api.github.com/repos/FortAwesome/Font-Awesome/zipball/f0c25837a3fe0e03783b939559e088abcbfb3c4b",
+                "reference": "f0c25837a3fe0e03783b939559e088abcbfb3c4b",
                 "shasum": ""
             },
             "type": "library",
@@ -100,7 +100,7 @@
                 "issues": "https://github.com/FortAwesome/Font-Awesome/issues",
                 "source": "https://github.com/FortAwesome/Font-Awesome"
             },
-            "time": "2022-11-15T18:34:54+00:00"
+            "time": "2023-08-02T20:27:06+00:00"
         },
         {
             "name": "phpunit/php-timer",
@@ -163,16 +163,16 @@
         },
         {
             "name": "twbs/bootstrap",
-            "version": "v5.2.3",
+            "version": "v5.3.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/twbs/bootstrap.git",
-                "reference": "cb021439c683d9805e2864c58095b92d405e9b11"
+                "reference": "2a1bf52b73fc9a97f6fef75aa1b29b3e9f0288b3"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/twbs/bootstrap/zipball/cb021439c683d9805e2864c58095b92d405e9b11",
-                "reference": "cb021439c683d9805e2864c58095b92d405e9b11",
+                "url": "https://api.github.com/repos/twbs/bootstrap/zipball/2a1bf52b73fc9a97f6fef75aa1b29b3e9f0288b3",
+                "reference": "2a1bf52b73fc9a97f6fef75aa1b29b3e9f0288b3",
                 "shasum": ""
             },
             "replace": {
@@ -207,9 +207,9 @@
             ],
             "support": {
                 "issues": "https://github.com/twbs/bootstrap/issues",
-                "source": "https://github.com/twbs/bootstrap/tree/v5.2.3"
+                "source": "https://github.com/twbs/bootstrap/tree/v5.3.1"
             },
-            "time": "2022-11-21T18:19:01+00:00"
+            "time": "2023-07-26T07:46:38+00:00"
         }
     ],
     "packages-dev": [],
@@ -222,5 +222,5 @@
         "php": ">=8.1"
     },
     "platform-dev": [],
-    "plugin-api-version": "2.3.0"
+    "plugin-api-version": "2.6.0"
 }
